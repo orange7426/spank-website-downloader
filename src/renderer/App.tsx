@@ -1,28 +1,32 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  MemoryRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from 'react-router-dom';
 import './App.scss';
-import { Alignment, Button, Navbar } from '@blueprintjs/core';
-
-const Hello = () => {
-  return (
-    <div>
-      <Button intent="success" text="button content" />
-    </div>
-  );
-};
+import { FocusStyleManager } from '@blueprintjs/core';
+import { useEffect } from 'react';
+import Menu from './pages/Menu';
+import Preferences from './pages/preferences/Preferences';
+import PreferencesGeneral from './pages/preferences/PreferencesGeneral';
+import PreferencesAccounts from './pages/preferences/PreferencesAccounts';
 
 export default function App() {
+  useEffect(() => {
+    FocusStyleManager.onlyShowFocusOnTabs();
+  }, []);
+
   return (
     <Router>
-      <Navbar className="bp4-dark">
-        <Navbar.Group align={Alignment.LEFT}>
-          <Navbar.Heading>SWorD</Navbar.Heading>
-          <Navbar.Divider />
-          <Button className="bp4-minimal" icon="home" text="Home" />
-          <Button className="bp4-minimal" icon="document" text="Files" />
-        </Navbar.Group>
-      </Navbar>
+      <Menu />
       <Routes>
-        <Route path="/" element={<Hello />} />
+        <Route path="/" element={<Outlet />}>
+          <Route path="preferences" element={<Preferences />}>
+            <Route path="general" element={<PreferencesGeneral />} />
+            <Route path="accounts" element={<PreferencesAccounts />} />
+          </Route>
+        </Route>
       </Routes>
     </Router>
   );
