@@ -50,6 +50,16 @@ declare global {
         auth: Auth,
         item: Item
       ) => Promise<void>;
+      readServiceFolder: (
+        libraryLocation: string,
+        serviceId: string
+      ) => Promise<
+        Array<{
+          item: Item;
+          localThumbnail: string | null;
+          status: string | null;
+        }>
+      >;
     };
   }
 }

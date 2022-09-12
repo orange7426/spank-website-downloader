@@ -7,6 +7,7 @@ import {
 } from '@blueprintjs/core';
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import LibraryTable from 'renderer/components/LibraryTable';
 import { useServiceAccountMapping } from 'renderer/hooks/useServiceAccountMapping';
 import crawlerManager from 'renderer/services/crawlerManager';
 
@@ -84,6 +85,7 @@ const LibraryService = () => {
           </Button>
         </ButtonGroup>
       </div>
+      <LibraryTable service={service} />
     </div>
   );
 };

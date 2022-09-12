@@ -14,7 +14,7 @@ const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
         item
       );
     },
-    { concurrency: 3 }
+    { concurrency: 1 }
   );
 };
 

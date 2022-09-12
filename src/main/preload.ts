@@ -54,6 +54,12 @@ contextBridge.exposeInMainWorld('database', {
       auth,
       item
     ),
+  readServiceFolder: (libraryLocation: string, serviceId: string) =>
+    ipcRenderer.invoke(
+      'database-read-service-folder',
+      libraryLocation,
+      serviceId
+    ),
 });
 
 contextBridge.exposeInMainWorld('preferences', {
