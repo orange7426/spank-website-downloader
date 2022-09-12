@@ -18,4 +18,22 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
   },
+  store: {
+    get(key: string) {
+      return ipcRenderer.sendSync('electron-store-get', key);
+    },
+    set(property: string, val: any) {
+      ipcRenderer.send('electron-store-set', property, val);
+    },
+    delete(property: string) {
+      ipcRenderer.send('electron-store-delete', property);
+    },
+  },
+});
+
+contextBridge.exposeInMainWorld('crawler', {
+  listAvailableServices: () =>
+    ipcRenderer.invoke('crawler-list-available-services'),
+  verifyAccount: (serviceId: string, username: string, password: string) =>
+    ipcRenderer.invoke('crawler-verify-account', serviceId, username, password),
 });
