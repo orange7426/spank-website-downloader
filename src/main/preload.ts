@@ -31,9 +31,27 @@ contextBridge.exposeInMainWorld('electron', {
   },
 });
 
+contextBridge.exposeInMainWorld('preferences', {
+  selectLibraryLocation: () =>
+    ipcRenderer.invoke('preferences-select-library-location'),
+});
+
 contextBridge.exposeInMainWorld('crawler', {
   listAvailableServices: () =>
     ipcRenderer.invoke('crawler-list-available-services'),
   verifyAccount: (serviceId: string, username: string, password: string) =>
     ipcRenderer.invoke('crawler-verify-account', serviceId, username, password),
+  pullList: (
+    serviceId: string,
+    username: string,
+    password: string,
+    page: string | undefined
+  ) =>
+    ipcRenderer.invoke(
+      'crawler-pull-list',
+      serviceId,
+      username,
+      password,
+      page
+    ),
 });

@@ -21,11 +21,27 @@ ipcMain.handle('crawler-list-available-services', async () =>
 ipcMain.handle(
   'crawler-verify-account',
   async (event, serviceId: string, username: string, password: string) => {
-    console.log(serviceId, username, password);
     const service = services[serviceId];
     if (serviceId == null) {
       throw new Error('Service not found');
     }
     return service.verifyAccount(crawler, username, password);
+  }
+);
+
+ipcMain.handle(
+  'crawler-pull-list',
+  async (
+    event,
+    serviceId: string,
+    username: string,
+    password: string,
+    page: string | undefined
+  ) => {
+    const service = services[serviceId];
+    if (serviceId == null) {
+      throw new Error('Service not found');
+    }
+    return service.pullList(crawler, username, password, page);
   }
 );

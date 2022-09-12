@@ -27,6 +27,9 @@ declare global {
         delete: (key: string) => void;
       };
     };
+    preferences: {
+      selectLibraryLocation: () => Promise<string>;
+    };
     crawler: {
       listAvailableServices: () => Promise<Record<string, Service>>;
       verifyAccount: (
@@ -34,6 +37,15 @@ declare global {
         username: string,
         password: string
       ) => Promise<boolean>;
+      pullList: (
+        serviceId: string,
+        username: string,
+        password: string,
+        page: string | undefined
+      ) => Promise<{
+        list: Array<Item>;
+        nextPage: string | null;
+      }>;
     };
   }
 }

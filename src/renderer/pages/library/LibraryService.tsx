@@ -1,7 +1,14 @@
-import { Button, NonIdealState, Spinner } from '@blueprintjs/core';
+import {
+  Button,
+  ButtonGroup,
+  Divider,
+  NonIdealState,
+  Spinner,
+} from '@blueprintjs/core';
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useServiceAccountMapping } from 'renderer/hooks/useServiceAccountMapping';
+import crawlerManager from 'renderer/services/crawlerManager';
 
 const ServiceHeader = ({ service }: { service: Service }) => {
   return (
@@ -44,10 +51,42 @@ const LibraryService = () => {
     return <Spinner />;
   }
 
+  if (service.accounts.length === 0) {
+    return (
+      <div>
+        <ServiceHeader service={service} />
+        <Empty service={service} />
+      </div>
+    );
+  }
+
+  //  TODO: Auto retry on multiple accounts
+  const account = service.accounts[0];
+
+  const pull = () => {
+    crawlerManager.pullIncrementalUpdates({
+      serviceId: service.id,
+      ...account,
+    });
+  };
+
   return (
     <div>
       <ServiceHeader service={service} />
-      {service.accounts.length === 0 ? <Empty service={service} /> : null}
+      <div>
+        <ButtonGroup>
+          <Button icon="cloud-download" onClick={pull}>
+            Pull Incremental Updates
+          </Button>
+          <Button icon="database" intent="warning" disabled>
+            Rebuild Database
+          </Button>
+          <Divider />
+          <Button icon="double-chevron-down" disabled>
+            Enqueue All Unscheduled Items
+          </Button>
+        </ButtonGroup>
+      </div>
     </div>
   );
 };

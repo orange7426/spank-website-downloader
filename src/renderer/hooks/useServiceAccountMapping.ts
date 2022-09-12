@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import _mapValues from 'lodash/mapValues';
 import { useAppSelector } from './store';
 

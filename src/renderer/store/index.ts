@@ -1,8 +1,10 @@
-import { createStore, combineReducers } from 'redux';
+import { combineReducers } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
+import { configureStore } from '@reduxjs/toolkit';
 import createElectronStore from './electronStore';
 
 import accounts from './accounts';
+import preferences from './preferences';
 
 const persistConfig = {
   key: 'root',
@@ -11,11 +13,14 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   accounts,
+  preferences,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-export const store = createStore(persistedReducer);
+export const store = configureStore({
+  reducer: persistedReducer,
+});
 
 export const persistor = persistStore(store);
 

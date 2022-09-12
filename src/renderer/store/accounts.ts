@@ -14,7 +14,7 @@ const initialState: AccountsState = {
   accounts: [],
 };
 
-export const counterSlice = createSlice({
+export const accountsSlice = createSlice({
   name: 'accounts',
   initialState,
   reducers: {
@@ -28,6 +28,6 @@ export const counterSlice = createSlice({
   },
 });
 
-export const { add, remove } = counterSlice.actions;
+export const { add, remove } = accountsSlice.actions;
 
-export default counterSlice.reducer;
+export default accountsSlice.reducer;
