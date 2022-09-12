@@ -1,6 +1,11 @@
 import realspankinginstitute from './realspankinginstitute';
 import bispnking from './bispanking';
 
+export interface Auth {
+  username: string;
+  password: string;
+}
+
 export interface Item {
   id: string;
   date: Date;
@@ -11,7 +16,7 @@ export interface Item {
 }
 
 // TODO: Make a dynamic list
-const services = [realspankinginstitute, bispnking];
+const services = [bispnking, realspankinginstitute];
 
 export default Object.fromEntries(
   services.map((service) => [service.id, service])

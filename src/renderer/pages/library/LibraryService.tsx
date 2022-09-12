@@ -64,10 +64,7 @@ const LibraryService = () => {
   const account = service.accounts[0];
 
   const pull = () => {
-    crawlerManager.pullIncrementalUpdates({
-      serviceId: service.id,
-      ...account,
-    });
+    crawlerManager.pullIncrementalUpdates(service.id, account);
   };
 
   return (

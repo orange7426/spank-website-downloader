@@ -1,7 +1,7 @@
 import type Crawler from 'crawler';
 import _zipObject from 'lodash/zipObject';
 import moment from 'moment';
-import type { Item } from '.';
+import type { Auth, Item } from '.';
 
 const base = 'http://www.bispanking.com/members/';
 
@@ -10,18 +10,11 @@ export default {
   name: 'Bi Spanking',
   website: 'http://www.bispanking.com/',
   logo: 'http://www.bispanking.com/images/bispanking_title.jpg',
-  verifyAccount: async (
-    crawler: Crawler,
-    username: string,
-    password: string
-  ) => {
+  verifyAccount: async (crawler: Crawler, auth: Auth) => {
     return new Promise((resolve) => {
       crawler.queue({
         uri: base,
-        auth: {
-          user: username,
-          pass: password,
-        },
+        auth,
         retries: 0,
         callback: (err, res, done) => {
           resolve(err ? false : res.statusCode === 200);
@@ -32,8 +25,7 @@ export default {
   },
   pullList: async (
     crawler: Crawler,
-    username: string,
-    password: string,
+    auth: Auth,
     page = 'http://www.bispanking.com/members/search.php'
   ): Promise<{
     list: Array<Item>;
@@ -42,10 +34,7 @@ export default {
     return new Promise((resolve, reject) => {
       crawler.queue({
         uri: page,
-        auth: {
-          user: username,
-          pass: password,
-        },
+        auth,
         retries: 0,
         callback: (err, res, done) => {
           if (err || res.statusCode !== 200) {
@@ -88,7 +77,9 @@ export default {
                   ? null
                   : moment(dateString, 'MMM. DD, YYYY').format('YYYYMMDD');
 
-              const id = `${date}.${title.replace(/[\s\W]+/g, '.')}`;
+              const id = `${date}.${title
+                .replace(/[\s\W]+/g, '.')
+                .replace(/\.$/g, '')}`;
 
               return {
                 id,

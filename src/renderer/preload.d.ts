@@ -1,5 +1,5 @@
 import { Channels } from 'main/preload';
-import type { Item as _Item } from 'main/services/index';
+import type { Auth as _Auth, Item as _Item } from 'main/services/index';
 
 declare global {
   interface Service {
@@ -9,6 +9,7 @@ declare global {
     logo: string | null;
   }
 
+  type Auth = _Auth;
   type Item = _Item;
 
   interface Window {
@@ -27,25 +28,28 @@ declare global {
         delete: (key: string) => void;
       };
     };
-    preferences: {
-      selectLibraryLocation: () => Promise<string>;
-    };
     crawler: {
       listAvailableServices: () => Promise<Record<string, Service>>;
-      verifyAccount: (
-        serviceId: string,
-        username: string,
-        password: string
-      ) => Promise<boolean>;
+      verifyAccount: (serviceId: string, auth: Auth) => Promise<boolean>;
       pullList: (
         serviceId: string,
-        username: string,
-        password: string,
+        auth: Auth,
         page: string | undefined
       ) => Promise<{
         list: Array<Item>;
         nextPage: string | null;
       }>;
+    };
+    preferences: {
+      selectLibraryLocation: () => Promise<string>;
+    };
+    database: {
+      createItemFolder: (
+        libraryLocation: string,
+        serviceId: string,
+        auth: Auth,
+        item: Item
+      ) => Promise<void>;
     };
   }
 }

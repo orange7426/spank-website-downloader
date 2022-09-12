@@ -1,18 +1,21 @@
-interface Endpoint {
-  serviceId: string;
-  username: string;
-  password: string;
-}
+import Bluebird from 'bluebird';
+import { store } from 'renderer/store';
 
-const pullIncrementalUpdates = async (endpoint: Endpoint) => {
-  console.log('Pull from endpoint', endpoint);
-  const res = await window.crawler.pullList(
-    endpoint.serviceId,
-    endpoint.username,
-    endpoint.password,
-    undefined
+const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
+  const { libraryLocation } = store.getState().preferences;
+  const res = await window.crawler.pullList(serviceId, auth, undefined);
+  await Bluebird.map(
+    res.list,
+    async (item) => {
+      await window.database.createItemFolder(
+        libraryLocation,
+        serviceId,
+        auth,
+        item
+      );
+    },
+    { concurrency: 3 }
   );
-  console.log(res);
 };
 
 export default {

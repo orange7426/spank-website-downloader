@@ -60,11 +60,10 @@ function AddAccountDialog(props: React.ComponentProps<typeof MultistepDialog>) {
       Object.keys(selectedServices).map(async (serviceId) => {
         cachedSelectedServices[serviceId] = 'verifying';
         setSelectedServices({ ...cachedSelectedServices });
-        const siteVerified = await window.crawler.verifyAccount(
-          serviceId,
+        const siteVerified = await window.crawler.verifyAccount(serviceId, {
           username,
-          password
-        );
+          password,
+        });
         cachedSelectedServices[serviceId] = siteVerified ? 'success' : 'failed';
         setSelectedServices({ ...cachedSelectedServices });
         return siteVerified;

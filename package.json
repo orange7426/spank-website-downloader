@@ -93,6 +93,7 @@
   "dependencies": {
     "@blueprintjs/core": "^4.9.4",
     "@reduxjs/toolkit": "^1.8.5",
+    "bluebird": "^3.7.2",
     "classnames": "^2.3.1",
     "crawler": "^1.3.0",
     "electron-debug": "^3.2.0",
@@ -106,6 +107,7 @@
     "react-redux": "^8.0.2",
     "react-router-dom": "^6.3.0",
     "redux": "^4.2.0",
+    "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0"
   },
   "devDependencies": {
@@ -115,6 +117,7 @@
     "@teamsupercell/typings-for-css-modules-loader": "^2.5.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
+    "@types/bluebird": "^3.5.36",
     "@types/crawler": "^1.2.2",
     "@types/jest": "^28.1.7",
     "@types/lodash": "^4.14.185",
@@ -122,6 +125,7 @@
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/react-test-renderer": "^18.0.0",
+    "@types/redux-logger": "^3.0.9",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/webpack-bundle-analyzer": "^4.4.2",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
