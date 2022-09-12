@@ -1,4 +1,5 @@
 import type Crawler from 'crawler';
+import type { Item } from '.';
 
 export default {
   id: 'realspankinginstitute',
@@ -24,5 +25,19 @@ export default {
         },
       });
     });
+  },
+  pullList: async (
+    crawler: Crawler,
+    username: string,
+    password: string,
+    page = 'http://www.bispanking.com/members/search.php'
+  ): Promise<{
+    list: Array<Item>;
+    nextPage: string | null;
+  }> => {
+    return {
+      list: [],
+      nextPage: null,
+    };
   },
 };

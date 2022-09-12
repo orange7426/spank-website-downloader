@@ -1,6 +1,6 @@
 import { createStore, combineReducers } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
-import createElectronStore from './electron-store';
+import createElectronStore from './electronStore';
 
 import accounts from './accounts';
 

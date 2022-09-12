@@ -1,4 +1,5 @@
 import { Channels } from 'main/preload';
+import type { Item as _Item } from 'main/services/index';
 
 declare global {
   interface Service {
@@ -7,6 +8,8 @@ declare global {
     website: string;
     logo: string | null;
   }
+
+  type Item = _Item;
 
   interface Window {
     electron: {

@@ -14,6 +14,8 @@ import Preferences from './pages/preferences/Preferences';
 import PreferencesGeneral from './pages/preferences/PreferencesGeneral';
 import PreferencesAccounts from './pages/preferences/PreferencesAccounts';
 import { store, persistor } from './store';
+import Library from './pages/library/Library';
+import LibraryService from './pages/library/LibraryService';
 
 export default function App() {
   useEffect(() => {
@@ -27,6 +29,9 @@ export default function App() {
           <Menu />
           <Routes>
             <Route path="/" element={<Outlet />}>
+              <Route path="library" element={<Library />}>
+                <Route path=":serviceId" element={<LibraryService />} />
+              </Route>
               <Route path="preferences" element={<Preferences />}>
                 <Route path="general" element={<PreferencesGeneral />} />
                 <Route path="accounts" element={<PreferencesAccounts />} />

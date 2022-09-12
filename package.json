@@ -28,7 +28,8 @@
     "start:main": "cross-env NODE_ENV=development electronmon -r ts-node/register/transpile-only .",
     "start:preload": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.preload.dev.ts",
     "start:renderer": "cross-env NODE_ENV=development TS_NODE_TRANSPILE_ONLY=true webpack serve --config ./.erb/configs/webpack.config.renderer.dev.ts",
-    "test": "jest"
+    "test": "jest",
+    "test-crawler": "ts-node --transpile-only ./src/main/test-crawler"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -99,6 +100,7 @@
     "electron-store": "^8.1.0",
     "electron-updater": "^5.2.2",
     "lodash": "^4.17.21",
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.2",
