@@ -60,6 +60,11 @@ declare global {
           status: string | null;
         }>
       >;
+      openItemFolder: (
+        libraryLocation: string,
+        serviceId: string,
+        item: Item
+      ) => Promise<void>;
     };
   }
 }

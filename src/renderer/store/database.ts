@@ -56,3 +56,10 @@ export const pullServiceFolder =
     );
     dispatch(update({ serviceId, serviceState: { items } }));
   };
+
+export const openItemFolder =
+  (serviceId: string, item: Item) =>
+  async (_dispatch: AppDispatch, getState: () => RootState) => {
+    const { libraryLocation } = getState().preferences;
+    window.database.openItemFolder(libraryLocation, serviceId, item);
+  };

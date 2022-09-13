@@ -1,7 +1,14 @@
-import { Card, Elevation, Button, ButtonGroup } from '@blueprintjs/core';
+import {
+  Card,
+  Elevation,
+  Button,
+  ButtonGroup,
+  Tag,
+  Intent,
+} from '@blueprintjs/core';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
-import { pullServiceFolder } from 'renderer/store/database';
+import { openItemFolder, pullServiceFolder } from 'renderer/store/database';
 
 const ItemView = (props: {
   item: {
@@ -9,8 +16,13 @@ const ItemView = (props: {
     localThumbnail: string | null;
     status: string | null;
   };
+  serviceId: string;
 }) => {
-  const { item } = props;
+  const { item, serviceId } = props;
+  const dispatch = useAppDispatch();
+  const openFolder = () => {
+    dispatch(openItemFolder(serviceId, item.item));
+  };
   return (
     <Card
       interactive
@@ -43,12 +55,61 @@ const ItemView = (props: {
         </h4>
         <p style={{ margin: 0 }}>{item.item.description}</p>
       </div>
-      <div>
-        <ButtonGroup>
-          <Button text="Download" icon="download" small disabled />
-          <Button text="Open" icon="share" small disabled />
-        </ButtonGroup>
-      </div>
+      {item.status === 'persistpending' && (
+        <div>
+          <Tag>New</Tag>
+        </div>
+      )}
+      {item.status === 'downloadpending' && (
+        <div>
+          <ButtonGroup>
+            <Button
+              text="Pending"
+              intent={Intent.PRIMARY}
+              icon="download"
+              small
+              disabled
+            />
+            <Button text="Open" icon="share" small onClick={openFolder} />
+          </ButtonGroup>
+        </div>
+      )}
+      {item.status === 'downloading' && (
+        <div>
+          <ButtonGroup>
+            <Button
+              text="Downloading"
+              intent={Intent.PRIMARY}
+              icon="download"
+              small
+              loading
+            />
+            <Button text="Open" icon="share" small onClick={openFolder} />
+          </ButtonGroup>
+        </div>
+      )}
+      {item.status === 'downloaded' && (
+        <div>
+          <ButtonGroup>
+            <Button
+              text="Downloaded"
+              intent={Intent.SUCCESS}
+              icon="download"
+              small
+              disabled
+            />
+            <Button text="Open" icon="share" small onClick={openFolder} />
+          </ButtonGroup>
+        </div>
+      )}
+      {item.status == null && (
+        <div>
+          <ButtonGroup>
+            <Button text="Download" icon="download" small />
+            <Button text="Open" icon="share" small onClick={openFolder} />
+          </ButtonGroup>
+        </div>
+      )}
     </Card>
   );
 };
@@ -66,7 +127,7 @@ export default ({ service }: { service: Service }) => {
   return (
     <div>
       {items.map((item) => (
-        <ItemView key={item.item.id} item={item} />
+        <ItemView key={item.item.id} item={item} serviceId={service.id} />
       ))}
     </div>
   );

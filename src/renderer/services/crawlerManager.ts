@@ -57,7 +57,7 @@ const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
       pendingItems.map((item) => ({
         item,
         localThumbnail: null,
-        status: 'new',
+        status: 'persistpending',
       }))
     );
     await store.dispatch(

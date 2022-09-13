@@ -60,6 +60,13 @@ contextBridge.exposeInMainWorld('database', {
       libraryLocation,
       serviceId
     ),
+  openItemFolder: (libraryLocation: string, serviceId: string, item: Item) =>
+    ipcRenderer.invoke(
+      'database-open-item-folder',
+      libraryLocation,
+      serviceId,
+      item
+    ),
 });
 
 contextBridge.exposeInMainWorld('preferences', {

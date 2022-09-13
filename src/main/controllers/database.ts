@@ -1,6 +1,6 @@
 // This is not a real database but only a wrapper of file system.
 
-import { ipcMain } from 'electron';
+import { ipcMain, shell } from 'electron';
 import type { Item, Auth } from 'main/services';
 import fs from 'fs';
 import path from 'path';
@@ -107,5 +107,16 @@ ipcMain.handle(
       return 0;
     });
     return list;
+  }
+);
+
+ipcMain.handle(
+  'database-open-item-folder',
+  async (event, libraryLocation: string, serviceId: string, item: Item) => {
+    const itemPath = path.join(libraryLocation, serviceId, item.id);
+    if (!fs.existsSync(itemPath)) {
+      throw new Error('Folder not exist');
+    }
+    shell.openPath(itemPath);
   }
 );
