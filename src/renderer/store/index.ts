@@ -14,6 +14,7 @@ import logger from 'redux-logger';
 import createElectronStore from './electronStore';
 
 import accounts from './accounts';
+import database from './database';
 import preferences from './preferences';
 
 const persistConfig = {
@@ -23,6 +24,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   accounts,
+  database,
   preferences,
 });
 
@@ -41,4 +43,5 @@ export const store = configureStore({
 export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
+export type AppGetState = typeof store.getState;
 export type AppDispatch = typeof store.dispatch;

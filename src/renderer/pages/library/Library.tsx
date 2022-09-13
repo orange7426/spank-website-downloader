@@ -12,6 +12,7 @@ const Library = () => {
         flexDirection: 'row',
         display: 'flex',
         flex: 1,
+        overflow: 'hidden',
       }}
     >
       <div
@@ -32,7 +33,14 @@ const Library = () => {
           ))}
         </Menu>
       </div>
-      <div style={{ flex: 1, padding: 8 }}>
+      <div
+        style={{
+          alignSelf: 'stretch',
+          flex: 1,
+          padding: 8,
+          overflowY: 'scroll',
+        }}
+      >
         <Outlet />
       </div>
     </div>

@@ -8,7 +8,7 @@ export interface Auth {
 
 export interface Item {
   id: string;
-  date: Date;
+  date: string;
   title: string;
   thumbnail: string;
   description: string;

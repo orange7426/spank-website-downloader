@@ -40,7 +40,7 @@ ipcMain.handle(
     const servicePath = path.join(libraryLocation, serviceId);
 
     if (!fs.existsSync(servicePath)) {
-      throw new Error('folder not exist!');
+      return [];
     }
 
     const subfolders = (
@@ -76,21 +76,36 @@ ipcMain.handle(
         const thumbnail = files.find(
           (file) => path.parse(file.name).name === 'thumbnail'
         );
-        const localThumbnail =
-          thumbnail == null
-            ? null
-            : url.pathToFileURL(path.join(itemPath, thumbnail.name));
+        let localThumbnail = null;
+        try {
+          const base64 = fs
+            .readFileSync(path.join(itemPath, thumbnail?.name ?? ''))
+            .toString('base64');
+          localThumbnail = `data:image/png;base64,${base64}`;
+        } catch (e) {
+          /* ignore */
+        }
         const status = files
           .find((file) => file.name.startsWith('status-'))
           ?.name?.split('-')?.[1];
         return {
           item,
-          localThumbnail: localThumbnail?.href,
+          localThumbnail,
           status,
         };
       },
       { concurrency: 1 }
     );
+
+    list.sort((a, b) => {
+      if (a.item.id > b.item.id) {
+        return -1;
+      }
+      if (a.item.id < b.item.id) {
+        return 1;
+      }
+      return 0;
+    });
     return list;
   }
 );

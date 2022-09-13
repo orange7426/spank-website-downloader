@@ -5,9 +5,10 @@ import {
   NonIdealState,
   Spinner,
 } from '@blueprintjs/core';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LibraryTable from 'renderer/components/LibraryTable';
+import { useAppDispatch } from 'renderer/hooks/store';
 import { useServiceAccountMapping } from 'renderer/hooks/useServiceAccountMapping';
 import crawlerManager from 'renderer/services/crawlerManager';
 
@@ -48,6 +49,8 @@ const LibraryService = () => {
     [services, serviceId]
   );
 
+  const [isPulling, setIsPulling] = React.useState(false);
+
   if (service == null) {
     return <Spinner />;
   }
@@ -64,8 +67,10 @@ const LibraryService = () => {
   //  TODO: Auto retry on multiple accounts
   const account = service.accounts[0];
 
-  const pull = () => {
-    crawlerManager.pullIncrementalUpdates(service.id, account);
+  const pull = async () => {
+    setIsPulling(true);
+    await crawlerManager.pullIncrementalUpdates(service.id, account);
+    setIsPulling(false);
   };
 
   return (
@@ -73,7 +78,7 @@ const LibraryService = () => {
       <ServiceHeader service={service} />
       <div>
         <ButtonGroup>
-          <Button icon="cloud-download" onClick={pull}>
+          <Button icon="cloud-download" loading={isPulling} onClick={pull}>
             Pull Incremental Updates
           </Button>
           <Button icon="database" intent="warning" disabled>
