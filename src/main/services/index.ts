@@ -17,7 +17,7 @@ export interface ItemAbstract {
 
 export interface Media {
   url: string;
-  filename?: string;
+  destination: string;
 }
 
 export interface ItemContent {

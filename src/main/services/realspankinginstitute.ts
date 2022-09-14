@@ -32,10 +32,10 @@ export default {
       nextPage: null,
     };
   },
-  pullItem: async (
+  pullItemContent: async (
     crawler: Crawler,
     auth: Auth,
-    item: ItemAbstract
+    itemAbstract: ItemAbstract
   ): Promise<ItemContent> => {
     return {
       videos: null,

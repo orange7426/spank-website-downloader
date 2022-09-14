@@ -112,6 +112,38 @@ const downloadItem = async (
 ) => {
   const { libraryLocation } = store.getState().preferences;
   console.log('Download Item', itemAbstract);
+
+  await store.dispatch(
+    updateItemStatus({
+      serviceId,
+      itemId: itemAbstract.id,
+      newStatus: 'analyzing',
+    })
+  );
+
+  // TODO: Check if item has been downloaded
+  const itemContent = await window.crawler.pullItemContent(
+    serviceId,
+    auth,
+    itemAbstract
+  );
+  console.log(itemContent);
+
+  await store.dispatch(
+    updateItemStatus({
+      serviceId,
+      itemId: itemAbstract.id,
+      newStatus: 'downloading',
+    })
+  );
+
+  await store.dispatch(
+    updateItemStatus({
+      serviceId,
+      itemId: itemAbstract.id,
+      newStatus: 'downloaded',
+    })
+  );
 };
 
 export const enqueueDownloadItem = async (
@@ -119,7 +151,7 @@ export const enqueueDownloadItem = async (
   auth: Auth,
   itemAbstract: ItemAbstract
 ) => {
-  store.dispatch(
+  await store.dispatch(
     updateItemStatus({
       serviceId,
       itemId: itemAbstract.id,

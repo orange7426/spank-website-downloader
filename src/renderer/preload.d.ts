@@ -46,6 +46,11 @@ declare global {
         list: Array<ItemAbstract>;
         nextPage: string | null;
       }>;
+      pullItemContent: (
+        serviceId: string,
+        auth: Auth,
+        itemAbstract: ItemAbstract
+      ) => Promise<ItemContent>;
     };
     preferences: {
       selectLibraryLocation: () => Promise<string>;

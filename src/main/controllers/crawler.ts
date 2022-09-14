@@ -39,3 +39,19 @@ ipcMain.handle(
     return service.pullList(crawler, auth, page);
   }
 );
+
+ipcMain.handle(
+  'crawler-pull-item-content',
+  async (
+    _event,
+    serviceId: string,
+    auth: Auth,
+    itemAbstract: ItemAbstract
+  ): Promise<ItemContent> => {
+    const service = services[serviceId];
+    if (serviceId == null) {
+      throw new Error('Service not found');
+    }
+    return service.pullItemContent(crawler, auth, itemAbstract);
+  }
+);

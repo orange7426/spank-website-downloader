@@ -39,6 +39,17 @@ contextBridge.exposeInMainWorld('crawler', {
     ipcRenderer.invoke('crawler-verify-account', serviceId, auth),
   pullList: (serviceId: string, auth: Auth, page: string | undefined) =>
     ipcRenderer.invoke('crawler-pull-list', serviceId, auth, page),
+  pullItemContent: (
+    serviceId: string,
+    auth: Auth,
+    itemAbstract: ItemAbstract
+  ) =>
+    ipcRenderer.invoke(
+      'crawler-pull-item-content',
+      serviceId,
+      auth,
+      itemAbstract
+    ),
 });
 
 contextBridge.exposeInMainWorld('database', {

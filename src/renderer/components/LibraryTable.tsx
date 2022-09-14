@@ -12,6 +12,19 @@ import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
 import { enqueueDownloadItem } from 'renderer/services/crawlerManager';
 import { openItemFolder, pullServiceFolder } from 'renderer/store/database';
 
+const loadingStatus = ['downloadpending', 'analyzing', 'downloading'];
+
+const getHumanReadableStatus = (status: string | null): string => {
+  return (
+    {
+      downloadpending: 'Pending',
+      analyzing: 'Analyzing',
+      downloading: 'Downloading',
+      unknown: 'Unknown',
+    }[status ?? 'unknown'] ?? 'Unknown'
+  );
+};
+
 const ItemView = (props: {
   item: {
     itemAbstract: ItemAbstract;
@@ -66,29 +79,24 @@ const ItemView = (props: {
           <Tag>New</Tag>
         </div>
       )}
-      {item.status === 'downloadpending' && (
+      {loadingStatus.includes(item.status ?? '') && (
         <div>
           <ButtonGroup>
             <Button
-              text="Pending"
-              intent={Intent.PRIMARY}
-              icon="download"
+              loading
               small
               disabled
+              intent={
+                item.status !== 'downloadpending' ? Intent.PRIMARY : Intent.NONE
+              }
             />
-            <Button text="Open" icon="share" small onClick={openFolder} />
-          </ButtonGroup>
-        </div>
-      )}
-      {item.status === 'downloading' && (
-        <div>
-          <ButtonGroup>
             <Button
-              text="Downloading"
-              intent={Intent.PRIMARY}
-              icon="download"
+              text={getHumanReadableStatus(item.status)}
+              intent={
+                item.status !== 'downloadpending' ? Intent.PRIMARY : Intent.NONE
+              }
               small
-              loading
+              disabled
             />
             <Button text="Open" icon="share" small onClick={openFolder} />
           </ButtonGroup>
