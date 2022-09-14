@@ -80,6 +80,12 @@ declare global {
         serviceId: string,
         itemAbstract: ItemAbstract
       ) => Promise<void>;
+      setItemStatus: (
+        libraryLocation: string,
+        serviceId: string,
+        itemAbstract: ItemAbstract,
+        newStatus: string
+      ) => Promise<void>;
     };
     downloadManager: {
       onTaskListUpdated: (

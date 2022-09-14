@@ -135,3 +135,29 @@ ipcMain.handle(
     shell.openPath(itemPath);
   }
 );
+
+ipcMain.handle(
+  'database-set-item-status',
+  async (
+    _event,
+    libraryLocation: string,
+    serviceId: string,
+    itemAbstract: ItemAbstract,
+    newStatus: string
+  ): Promise<void> => {
+    const itemPath = path.join(libraryLocation, serviceId, itemAbstract.id);
+    if (!fs.existsSync(itemPath)) {
+      throw new Error('Folder not exist');
+    }
+    const files = await fs.promises.readdir(itemPath, {
+      withFileTypes: true,
+    });
+    await Promise.all(
+      files
+        .filter((file) => file.name.startsWith('status-'))
+        .map((file) => fs.promises.unlink(path.join(itemPath, file.name)))
+    );
+    const newStatusFilePath = path.join(itemPath, `status-${newStatus}`);
+    fs.closeSync(fs.openSync(newStatusFilePath, 'w'));
+  }
+);

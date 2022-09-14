@@ -84,6 +84,19 @@ contextBridge.exposeInMainWorld('database', {
       serviceId,
       itemAbstract
     ),
+  setItemStatus: (
+    libraryLocation: string,
+    serviceId: string,
+    itemAbstract: ItemAbstract,
+    newStatus: string
+  ) =>
+    ipcRenderer.invoke(
+      'database-set-item-status',
+      libraryLocation,
+      serviceId,
+      itemAbstract,
+      newStatus
+    ),
 });
 
 contextBridge.exposeInMainWorld('downloadManager', {

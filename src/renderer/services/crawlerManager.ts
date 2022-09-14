@@ -106,66 +106,90 @@ export const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
   });
 };
 
-const downloadItem = async (
+const downloadItemImpl = async (
   serviceId: string,
   auth: Auth,
   itemAbstract: ItemAbstract
 ) => {
-  const { libraryLocation } = store.getState().preferences;
+  try {
+    const { libraryLocation } = store.getState().preferences;
 
-  await store.dispatch(
-    updateItemStatus({
-      serviceId,
-      itemId: itemAbstract.id,
-      newStatus: 'analyzing',
-    })
-  );
-
-  // TODO: Check if item has been downloaded
-  const itemContent = await window.crawler.pullItemContent(
-    serviceId,
-    auth,
-    itemAbstract
-  );
-
-  await store.dispatch(
-    updateItemStatus({
-      serviceId,
-      itemId: itemAbstract.id,
-      newStatus: 'downloading',
-    })
-  );
-
-  await Bluebird.map(
-    itemContent,
-    async (media) => {
-      // TODO: Progress bar
-      await window.downloadManager.download(
-        libraryLocation,
+    await store.dispatch(
+      updateItemStatus({
         serviceId,
-        itemAbstract.id,
-        uuidv4(),
-        auth,
-        media.url,
-        media.destination
-      );
-    },
-    {
-      // Set concurrent 10 to prevent IPC panic
-      concurrency: 10,
-    }
-  );
+        itemId: itemAbstract.id,
+        newStatus: 'analyzing',
+      })
+    );
 
-  await store.dispatch(
-    updateItemStatus({
+    // TODO: Check if item has been downloaded
+    const itemContent = await window.crawler.pullItemContent(
       serviceId,
-      itemId: itemAbstract.id,
-      newStatus: 'downloaded',
-    })
-  );
+      auth,
+      itemAbstract
+    );
+
+    await store.dispatch(
+      updateItemStatus({
+        serviceId,
+        itemId: itemAbstract.id,
+        newStatus: 'downloading',
+      })
+    );
+
+    await Bluebird.map(
+      itemContent,
+      async (media) => {
+        // TODO: Progress bar
+        await window.downloadManager.download(
+          libraryLocation,
+          serviceId,
+          itemAbstract.id,
+          uuidv4(),
+          auth,
+          media.url,
+          media.destination
+        );
+      },
+      {
+        // Set concurrent 10 to prevent IPC panic
+        concurrency: 10,
+      }
+    );
+
+    await window.database.setItemStatus(
+      libraryLocation,
+      serviceId,
+      itemAbstract,
+      'downloaded'
+    );
+
+    await store.dispatch(
+      updateItemStatus({
+        serviceId,
+        itemId: itemAbstract.id,
+        newStatus: 'downloaded',
+      })
+    );
+  } catch (e) {
+    if (e instanceof Error) {
+      toaster.show({
+        message: `Failed to download [${serviceId}][${itemAbstract.title}]. Error message: ${e.message}`,
+        intent: Intent.DANGER,
+        icon: 'warning-sign',
+      });
+    }
+    await store.dispatch(
+      updateItemStatus({
+        serviceId,
+        itemId: itemAbstract.id,
+        newStatus: 'failed',
+      })
+    );
+  }
 };
 
-export const enqueueDownloadItem = async (
+export const downloadItem = async (
   serviceId: string,
   auth: Auth,
   itemAbstract: ItemAbstract
@@ -177,5 +201,5 @@ export const enqueueDownloadItem = async (
       newStatus: 'downloadpending',
     })
   );
-  queue.add(() => downloadItem(serviceId, auth, itemAbstract));
+  await queue.add(() => downloadItemImpl(serviceId, auth, itemAbstract));
 };

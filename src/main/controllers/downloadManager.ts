@@ -23,6 +23,7 @@ const queue = new BetterQueue(
     const { uuid, auth, url, path: fullPath } = task;
     console.log(`Downloading ${uuid}`);
     tasks[uuid].status = 'downloading';
+    // TODO: Send per-file progress: download-manager-update-task-list
     download(
       url,
       { auth: `${auth.username}:${auth.password}` },

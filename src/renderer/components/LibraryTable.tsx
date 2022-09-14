@@ -9,7 +9,7 @@ import {
 } from '@blueprintjs/core';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
-import { enqueueDownloadItem } from 'renderer/services/crawlerManager';
+import { downloadItem } from 'renderer/services/crawlerManager';
 import { openItemFolder, pullServiceFolder } from 'renderer/store/database';
 
 const loadingStatus = ['downloadpending', 'analyzing', 'downloading'];
@@ -40,7 +40,7 @@ const ItemView = (props: {
     dispatch(openItemFolder(serviceId, item.itemAbstract));
   };
   const download = () => {
-    enqueueDownloadItem(serviceId, auth, item.itemAbstract);
+    downloadItem(serviceId, auth, item.itemAbstract);
   };
   return (
     <Card
@@ -111,6 +111,20 @@ const ItemView = (props: {
               icon="download"
               small
               disabled
+            />
+            <Button text="Open" icon="share" small onClick={openFolder} />
+          </ButtonGroup>
+        </div>
+      )}
+      {item.status === 'failed' && (
+        <div>
+          <ButtonGroup>
+            <Button
+              text="Retry"
+              icon="refresh"
+              small
+              intent={Intent.DANGER}
+              onClick={download}
             />
             <Button text="Open" icon="share" small onClick={openFolder} />
           </ButtonGroup>
