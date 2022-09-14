@@ -2,13 +2,18 @@
 import Bluebird from 'bluebird';
 import { store } from 'renderer/store';
 import {
-  DatabaseServiceItem,
   pullServiceFolder,
   update as updateDatabaseCache,
+  updateItemStatus,
 } from 'renderer/store/database';
 import _partition from 'lodash/partition';
 import { toaster } from 'renderer/services/toaster';
 import { Intent } from '@blueprintjs/core';
+import PQueue from 'p-queue';
+
+const queue = new PQueue({
+  concurrency: 1,
+});
 
 const mergeAndSortItems = (
   ...items: Array<Array<DatabaseServiceItem>>
@@ -26,7 +31,7 @@ const mergeAndSortItems = (
   return merged;
 };
 
-const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
+export const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
   toaster.show({
     message: `Contacting ${serviceId}`,
     icon: 'more',
@@ -37,10 +42,10 @@ const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
 
   // Pull current ids
   const { items } = store.getState().database.services[serviceId];
-  const existingIds = items.map((item) => item.item.id);
+  const existingIds = items.map((item) => item.itemAbstract.id);
 
   // Pending items for folder creation
-  const pendingItems = [];
+  const pendingItemAbstracts = [];
 
   let nextPage: string | undefined;
   while (true) {
@@ -51,11 +56,11 @@ const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
     );
 
     // Insert new items into database with [new] status
-    pendingItems.push(...newItems);
+    pendingItemAbstracts.push(...newItems);
     const updatedItems = mergeAndSortItems(
       items,
-      pendingItems.map((item) => ({
-        item,
+      pendingItemAbstracts.map((itemAbstract) => ({
+        itemAbstract,
         localThumbnail: null,
         status: 'persistpending',
       }))
@@ -73,19 +78,19 @@ const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
   }
 
   toaster.show({
-    message: `Found ${pendingItems.length} new items. Start persisting.`,
+    message: `Found ${pendingItemAbstracts.length} new items. Start persisting.`,
     icon: 'floppy-disk',
   });
 
   const { libraryLocation } = store.getState().preferences;
   await Bluebird.map(
-    pendingItems,
-    async (item) => {
+    pendingItemAbstracts,
+    async (itemAbstract) => {
       await window.database.createItemFolder(
         libraryLocation,
         serviceId,
         auth,
-        item
+        itemAbstract
       );
     },
     { concurrency: 1 }
@@ -100,6 +105,26 @@ const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
   });
 };
 
-export default {
-  pullIncrementalUpdates,
+const downloadItem = async (
+  serviceId: string,
+  auth: Auth,
+  itemAbstract: ItemAbstract
+) => {
+  const { libraryLocation } = store.getState().preferences;
+  console.log('Download Item', itemAbstract);
+};
+
+export const enqueueDownloadItem = async (
+  serviceId: string,
+  auth: Auth,
+  itemAbstract: ItemAbstract
+) => {
+  store.dispatch(
+    updateItemStatus({
+      serviceId,
+      itemId: itemAbstract.id,
+      newStatus: 'downloadpending',
+    })
+  );
+  queue.add(() => downloadItem(serviceId, auth, itemAbstract));
 };

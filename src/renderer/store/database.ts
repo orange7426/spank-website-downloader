@@ -1,14 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { TypedUseSelectorHook } from 'react-redux';
 import type { AppDispatch, RootState } from '.';
 
 // Render side database cache
-
-export interface DatabaseServiceItem {
-  item: Item;
-  localThumbnail: string | null;
-  status: string | null;
-}
 
 export interface ServiceState {
   items: Array<DatabaseServiceItem>;
@@ -39,10 +32,27 @@ export const databaseSlice = createSlice({
         ...serviceState,
       };
     },
+    updateItemStatus: (
+      state,
+      action: PayloadAction<{
+        serviceId: string;
+        itemId: string;
+        newStatus: string | null;
+      }>
+    ) => {
+      const { serviceId, itemId, newStatus } = action.payload;
+      const { items } = state.services[serviceId];
+      if (items == null) return;
+      const index = items.findIndex(
+        (item) => item?.itemAbstract?.id === itemId
+      );
+      if (index < 0) return;
+      state.services[serviceId].items[index].status = newStatus;
+    },
   },
 });
 
-export const { update } = databaseSlice.actions;
+export const { update, updateItemStatus } = databaseSlice.actions;
 
 export default databaseSlice.reducer;
 
@@ -58,8 +68,8 @@ export const pullServiceFolder =
   };
 
 export const openItemFolder =
-  (serviceId: string, item: Item) =>
+  (serviceId: string, itemAbstract: ItemAbstract) =>
   async (_dispatch: AppDispatch, getState: () => RootState) => {
     const { libraryLocation } = getState().preferences;
-    window.database.openItemFolder(libraryLocation, serviceId, item);
+    window.database.openItemFolder(libraryLocation, serviceId, itemAbstract);
   };

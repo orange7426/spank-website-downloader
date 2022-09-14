@@ -1,5 +1,10 @@
 import { Channels } from 'main/preload';
-import type { Auth as _Auth, Item as _Item } from 'main/services/index';
+import type {
+  Auth as _Auth,
+  ItemAbstract as _ItemAbstract,
+  ItemContent as _ItemContent,
+} from 'main/services/index';
+import type { DatabaseServiceItem as _DatabaseServiceItem } from 'main/controllers/database';
 
 declare global {
   interface Service {
@@ -10,7 +15,9 @@ declare global {
   }
 
   type Auth = _Auth;
-  type Item = _Item;
+  type ItemAbstract = _ItemAbstract;
+  type ItemContent = _ItemContent;
+  type DatabaseServiceItem = _DatabaseServiceItem;
 
   interface Window {
     electron: {
@@ -36,7 +43,7 @@ declare global {
         auth: Auth,
         page: string | undefined
       ) => Promise<{
-        list: Array<Item>;
+        list: Array<ItemAbstract>;
         nextPage: string | null;
       }>;
     };
@@ -48,14 +55,14 @@ declare global {
         libraryLocation: string,
         serviceId: string,
         auth: Auth,
-        item: Item
+        itemAbstract: ItemAbstract
       ) => Promise<void>;
       readServiceFolder: (
         libraryLocation: string,
         serviceId: string
       ) => Promise<
         Array<{
-          item: Item;
+          itemAbstract: ItemAbstract;
           localThumbnail: string | null;
           status: string | null;
         }>
@@ -63,7 +70,7 @@ declare global {
       openItemFolder: (
         libraryLocation: string,
         serviceId: string,
-        item: Item
+        itemAbstract: ItemAbstract
       ) => Promise<void>;
     };
   }

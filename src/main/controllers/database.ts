@@ -1,42 +1,51 @@
 // This is not a real database but only a wrapper of file system.
 
 import { ipcMain, shell } from 'electron';
-import type { Item, Auth } from 'main/services';
+import type { ItemAbstract, Auth } from 'main/services';
 import fs from 'fs';
 import path from 'path';
-import url from 'url';
 import Bluebird from 'bluebird';
 import { download } from '../utils/crawler';
+
+export interface DatabaseServiceItem {
+  itemAbstract: ItemAbstract;
+  localThumbnail: string | null;
+  status: string | null;
+}
 
 ipcMain.handle(
   'database-create-item-folder',
   async (
-    event,
+    _event,
     libraryLocation: string,
     serviceId: string,
     auth: Auth,
-    item: Item
-  ) => {
-    const itemPath = path.join(libraryLocation, serviceId, item.id);
+    itemAbstract: ItemAbstract
+  ): Promise<void> => {
+    const itemPath = path.join(libraryLocation, serviceId, itemAbstract.id);
     if (!fs.existsSync(itemPath)) {
       await fs.promises.mkdir(itemPath, { recursive: true });
     }
     await download(
-      item.thumbnail,
+      itemAbstract.thumbnail,
       {
         auth: `${auth.username}:${auth.password}`,
       },
       itemPath,
       'thumbnail'
     );
-    const data = JSON.stringify(item);
+    const data = JSON.stringify(itemAbstract);
     await fs.promises.writeFile(path.join(itemPath, 'data.json'), data);
   }
 );
 
 ipcMain.handle(
   'database-read-service-folder',
-  async (event, libraryLocation: string, serviceId: string) => {
+  async (
+    _event,
+    libraryLocation: string,
+    serviceId: string
+  ): Promise<Array<DatabaseServiceItem>> => {
     const servicePath = path.join(libraryLocation, serviceId);
 
     if (!fs.existsSync(servicePath)) {
@@ -51,7 +60,7 @@ ipcMain.handle(
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name);
 
-    const items = subfolders
+    const itemAbstracts = subfolders
       .filter((subfolder) =>
         fs.existsSync(path.join(servicePath, subfolder, 'data.json'))
       )
@@ -65,11 +74,11 @@ ipcMain.handle(
         }
         return data;
       })
-      .filter((item) => item != null);
+      .filter((itemAbstract) => itemAbstract != null);
     const list = await Bluebird.map(
-      items,
-      async (item) => {
-        const itemPath = path.join(servicePath, item.id);
+      itemAbstracts,
+      async (itemAbstract) => {
+        const itemPath = path.join(servicePath, itemAbstract.id);
         const files = await fs.promises.readdir(itemPath, {
           withFileTypes: true,
         });
@@ -85,11 +94,12 @@ ipcMain.handle(
         } catch (e) {
           /* ignore */
         }
-        const status = files
-          .find((file) => file.name.startsWith('status-'))
-          ?.name?.split('-')?.[1];
+        const status =
+          files
+            .find((file) => file.name.startsWith('status-'))
+            ?.name?.split('-')?.[1] ?? null;
         return {
-          item,
+          itemAbstract,
           localThumbnail,
           status,
         };
@@ -98,10 +108,10 @@ ipcMain.handle(
     );
 
     list.sort((a, b) => {
-      if (a.item.id > b.item.id) {
+      if (a.itemAbstract.id > b.itemAbstract.id) {
         return -1;
       }
-      if (a.item.id < b.item.id) {
+      if (a.itemAbstract.id < b.itemAbstract.id) {
         return 1;
       }
       return 0;
@@ -112,8 +122,13 @@ ipcMain.handle(
 
 ipcMain.handle(
   'database-open-item-folder',
-  async (event, libraryLocation: string, serviceId: string, item: Item) => {
-    const itemPath = path.join(libraryLocation, serviceId, item.id);
+  async (
+    _event,
+    libraryLocation: string,
+    serviceId: string,
+    itemAbstract: ItemAbstract
+  ): Promise<void> => {
+    const itemPath = path.join(libraryLocation, serviceId, itemAbstract.id);
     if (!fs.existsSync(itemPath)) {
       throw new Error('Folder not exist');
     }

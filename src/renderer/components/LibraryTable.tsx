@@ -5,23 +5,29 @@ import {
   ButtonGroup,
   Tag,
   Intent,
+  Spinner,
 } from '@blueprintjs/core';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
+import { enqueueDownloadItem } from 'renderer/services/crawlerManager';
 import { openItemFolder, pullServiceFolder } from 'renderer/store/database';
 
 const ItemView = (props: {
   item: {
-    item: Item;
+    itemAbstract: ItemAbstract;
     localThumbnail: string | null;
     status: string | null;
   };
   serviceId: string;
+  auth: Auth;
 }) => {
-  const { item, serviceId } = props;
+  const { item, serviceId, auth } = props;
   const dispatch = useAppDispatch();
   const openFolder = () => {
-    dispatch(openItemFolder(serviceId, item.item));
+    dispatch(openItemFolder(serviceId, item.itemAbstract));
+  };
+  const download = () => {
+    enqueueDownloadItem(serviceId, auth, item.itemAbstract);
   };
   return (
     <Card
@@ -49,11 +55,11 @@ const ItemView = (props: {
       <div style={{ flex: 1 }}>
         <h4 style={{ margin: 0 }}>
           <span style={{ fontWeight: 'normal', fontSize: '0.8em' }}>
-            {item.item.date}
+            {item.itemAbstract.date}
           </span>{' '}
-          {item.item.title}
+          {item.itemAbstract.title}
         </h4>
-        <p style={{ margin: 0 }}>{item.item.description}</p>
+        <p style={{ margin: 0 }}>{item.itemAbstract.description}</p>
       </div>
       {item.status === 'persistpending' && (
         <div>
@@ -105,7 +111,7 @@ const ItemView = (props: {
       {item.status == null && (
         <div>
           <ButtonGroup>
-            <Button text="Download" icon="download" small />
+            <Button text="Download" icon="download" small onClick={download} />
             <Button text="Open" icon="share" small onClick={openFolder} />
           </ButtonGroup>
         </div>
@@ -114,20 +120,32 @@ const ItemView = (props: {
   );
 };
 
-export default ({ service }: { service: Service }) => {
+export default ({ service, auth }: { service: Service; auth: Auth }) => {
   const dispatch = useAppDispatch();
-  React.useEffect(() => {
-    dispatch(pullServiceFolder(service.id));
+  const [isLoading, setIsLoading] = React.useState(false);
+  const pullFromDisk = React.useCallback(async () => {
+    setIsLoading(true);
+    await dispatch(pullServiceFolder(service.id));
+    setIsLoading(false);
   }, [dispatch, service.id]);
+  React.useEffect(() => {
+    pullFromDisk();
+  }, [dispatch, pullFromDisk, service.id]);
 
-  const items = useAppSelector(
+  const databaseServiceItems = useAppSelector(
     (state) => state.database.services[service.id]?.items ?? []
   );
 
   return (
     <div>
-      {items.map((item) => (
-        <ItemView key={item.item.id} item={item} serviceId={service.id} />
+      {isLoading && <Spinner />}
+      {databaseServiceItems.map((item) => (
+        <ItemView
+          key={item.itemAbstract.id}
+          item={item}
+          serviceId={service.id}
+          auth={auth}
+        />
       ))}
     </div>
   );

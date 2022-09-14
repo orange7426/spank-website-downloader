@@ -5,12 +5,11 @@ import {
   NonIdealState,
   Spinner,
 } from '@blueprintjs/core';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 import LibraryTable from 'renderer/components/LibraryTable';
-import { useAppDispatch } from 'renderer/hooks/store';
 import { useServiceAccountMapping } from 'renderer/hooks/useServiceAccountMapping';
-import crawlerManager from 'renderer/services/crawlerManager';
+import { pullIncrementalUpdates } from 'renderer/services/crawlerManager';
 
 const ServiceHeader = ({ service }: { service: Service }) => {
   return (
@@ -69,7 +68,7 @@ const LibraryService = () => {
 
   const pull = async () => {
     setIsPulling(true);
-    await crawlerManager.pullIncrementalUpdates(service.id, account);
+    await pullIncrementalUpdates(service.id, account);
     setIsPulling(false);
   };
 
@@ -90,7 +89,7 @@ const LibraryService = () => {
           </Button>
         </ButtonGroup>
       </div>
-      <LibraryTable service={service} />
+      <LibraryTable service={service} auth={account} />
     </div>
   );
 };

@@ -12,7 +12,7 @@ ipcMain.handle('crawler-list-available-services', async () =>
 
 ipcMain.handle(
   'crawler-verify-account',
-  async (event, serviceId: string, auth: Auth) => {
+  async (_event, serviceId: string, auth: Auth): Promise<boolean> => {
     const service = services[serviceId];
     if (serviceId == null) {
       throw new Error('Service not found');
@@ -23,7 +23,15 @@ ipcMain.handle(
 
 ipcMain.handle(
   'crawler-pull-list',
-  async (event, serviceId: string, auth: Auth, page: string | undefined) => {
+  async (
+    _event,
+    serviceId: string,
+    auth: Auth,
+    page: string | undefined
+  ): Promise<{
+    list: Array<ItemAbstract>;
+    nextPage: string | null;
+  }> => {
     const service = services[serviceId];
     if (serviceId == null) {
       throw new Error('Service not found');

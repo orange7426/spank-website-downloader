@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { ItemAbstract } from './services';
 
 export type Channels = 'ipc-example';
 
@@ -45,14 +46,14 @@ contextBridge.exposeInMainWorld('database', {
     libraryLocation: string,
     serviceId: string,
     auth: Auth,
-    item: Item
+    itemAbstract: ItemAbstract
   ) =>
     ipcRenderer.invoke(
       'database-create-item-folder',
       libraryLocation,
       serviceId,
       auth,
-      item
+      itemAbstract
     ),
   readServiceFolder: (libraryLocation: string, serviceId: string) =>
     ipcRenderer.invoke(
@@ -60,12 +61,16 @@ contextBridge.exposeInMainWorld('database', {
       libraryLocation,
       serviceId
     ),
-  openItemFolder: (libraryLocation: string, serviceId: string, item: Item) =>
+  openItemFolder: (
+    libraryLocation: string,
+    serviceId: string,
+    itemAbstract: ItemAbstract
+  ) =>
     ipcRenderer.invoke(
       'database-open-item-folder',
       libraryLocation,
       serviceId,
-      item
+      itemAbstract
     ),
 });
 

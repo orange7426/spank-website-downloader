@@ -20,6 +20,7 @@ import preferences from './preferences';
 const persistConfig = {
   key: 'root',
   storage: createElectronStore(),
+  blacklist: ['database'],
 };
 
 const rootReducer = combineReducers({

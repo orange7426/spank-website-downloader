@@ -6,13 +6,23 @@ export interface Auth {
   password: string;
 }
 
-export interface Item {
+export interface ItemAbstract {
   id: string;
   date: string;
   title: string;
   thumbnail: string;
   description: string;
   link: string;
+}
+
+export interface Media {
+  url: string;
+  filename?: string;
+}
+
+export interface ItemContent {
+  videos: Array<Media> | null;
+  photos: Array<Media> | null;
 }
 
 // TODO: Make a dynamic list

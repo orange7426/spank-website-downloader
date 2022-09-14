@@ -1,7 +1,7 @@
 import type Crawler from 'crawler';
 import _zipObject from 'lodash/zipObject';
 import moment from 'moment';
-import type { Auth, Item } from '.';
+import type { Auth, ItemAbstract, ItemContent } from '.';
 
 const base = 'http://www.bispanking.com/members/';
 
@@ -10,7 +10,7 @@ export default {
   name: 'Bi Spanking',
   website: 'http://www.bispanking.com/',
   logo: 'http://www.bispanking.com/images/bispanking_title.jpg',
-  verifyAccount: async (crawler: Crawler, auth: Auth) => {
+  verifyAccount: async (crawler: Crawler, auth: Auth): Promise<boolean> => {
     return new Promise((resolve) => {
       crawler.queue({
         uri: base,
@@ -28,7 +28,7 @@ export default {
     auth: Auth,
     page = 'http://www.bispanking.com/members/search.php'
   ): Promise<{
-    list: Array<Item>;
+    list: Array<ItemAbstract>;
     nextPage: string | null;
   }> => {
     return new Promise((resolve, reject) => {
@@ -108,5 +108,15 @@ export default {
         },
       });
     });
+  },
+  pullItem: async (
+    crawler: Crawler,
+    auth: Auth,
+    item: ItemAbstract
+  ): Promise<ItemContent> => {
+    return {
+      videos: null,
+      photos: null,
+    };
   },
 };
