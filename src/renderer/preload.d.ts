@@ -5,6 +5,8 @@ import type {
   ItemContent as _ItemContent,
 } from 'main/services/index';
 import type { DatabaseServiceItem as _DatabaseServiceItem } from 'main/controllers/database';
+import { IpcRendererEvent } from 'electron';
+import { Task } from 'main/controllers/downloadManager';
 
 declare global {
   interface Service {
@@ -18,6 +20,7 @@ declare global {
   type ItemAbstract = _ItemAbstract;
   type ItemContent = _ItemContent;
   type DatabaseServiceItem = _DatabaseServiceItem;
+  type DownloadManagerTask = Task;
 
   interface Window {
     electron: {
@@ -77,6 +80,23 @@ declare global {
         serviceId: string,
         itemAbstract: ItemAbstract
       ) => Promise<void>;
+    };
+    downloadManager: {
+      onTaskListUpdated: (
+        callback: (
+          event: IpcRendererEvent,
+          tasks: Array<DownloadManagerTask>
+        ) => void
+      ) => void;
+      download: (
+        libraryLocation: string,
+        serviceId: string,
+        itemId: string,
+        uuid: string,
+        auth: Auth,
+        url: string,
+        localPath: string
+      ) => Promise<DownloadManagerTask>;
     };
   }
 }

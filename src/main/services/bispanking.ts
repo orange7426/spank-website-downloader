@@ -172,9 +172,6 @@ export default {
       )
     ).filter((photo): photo is Media => photo != null);
 
-    return {
-      videos,
-      photos,
-    };
+    return [...videos, ...photos];
   },
 };

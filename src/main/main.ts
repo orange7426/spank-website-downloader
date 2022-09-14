@@ -17,6 +17,7 @@ import { resolveHtmlPath } from './utils/resolveHtmlPath';
 
 import './controllers/crawler';
 import './controllers/database';
+import './controllers/downloadManager';
 import './controllers/preferences';
 import './controllers/store';
 

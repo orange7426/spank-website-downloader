@@ -10,6 +10,7 @@ import _partition from 'lodash/partition';
 import { toaster } from 'renderer/services/toaster';
 import { Intent } from '@blueprintjs/core';
 import PQueue from 'p-queue';
+import { v4 as uuidv4 } from 'uuid';
 
 const queue = new PQueue({
   concurrency: 1,
@@ -20,10 +21,10 @@ const mergeAndSortItems = (
 ): Array<DatabaseServiceItem> => {
   const merged = Array.prototype.concat.apply([], items);
   merged.sort((a, b) => {
-    if (a.item.id > b.item.id) {
+    if (a.itemAbstract.id > b.itemAbstract.id) {
       return -1;
     }
-    if (a.item.id < b.item.id) {
+    if (a.itemAbstract.id < b.itemAbstract.id) {
       return 1;
     }
     return 0;
@@ -111,7 +112,6 @@ const downloadItem = async (
   itemAbstract: ItemAbstract
 ) => {
   const { libraryLocation } = store.getState().preferences;
-  console.log('Download Item', itemAbstract);
 
   await store.dispatch(
     updateItemStatus({
@@ -127,7 +127,6 @@ const downloadItem = async (
     auth,
     itemAbstract
   );
-  console.log(itemContent);
 
   await store.dispatch(
     updateItemStatus({
@@ -135,6 +134,26 @@ const downloadItem = async (
       itemId: itemAbstract.id,
       newStatus: 'downloading',
     })
+  );
+
+  await Bluebird.map(
+    itemContent,
+    async (media) => {
+      // TODO: Progress bar
+      await window.downloadManager.download(
+        libraryLocation,
+        serviceId,
+        itemAbstract.id,
+        uuidv4(),
+        auth,
+        media.url,
+        media.destination
+      );
+    },
+    {
+      // Set concurrent 10 to prevent IPC panic
+      concurrency: 10,
+    }
   );
 
   await store.dispatch(

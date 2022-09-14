@@ -20,10 +20,7 @@ export interface Media {
   destination: string;
 }
 
-export interface ItemContent {
-  videos: Array<Media> | null;
-  photos: Array<Media> | null;
-}
+export type ItemContent = Array<Media>;
 
 // TODO: Make a dynamic list
 const services = [bispnking, realspankinginstitute];

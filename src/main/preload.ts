@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
+import { Task } from './controllers/downloadManager';
 import { ItemAbstract } from './services';
 
 export type Channels = 'ipc-example';
@@ -82,6 +83,31 @@ contextBridge.exposeInMainWorld('database', {
       libraryLocation,
       serviceId,
       itemAbstract
+    ),
+});
+
+contextBridge.exposeInMainWorld('downloadManager', {
+  onTaskListUpdated: (
+    callback: (event: IpcRendererEvent, tasks: Array<Task>) => void
+  ) => ipcRenderer.on('download-manager-update-task-list', callback),
+  download: (
+    libraryLocation: string,
+    serviceId: string,
+    itemId: string,
+    uuid: string,
+    auth: Auth,
+    url: string,
+    localPath: string
+  ) =>
+    ipcRenderer.invoke(
+      'download-manager-download',
+      libraryLocation,
+      serviceId,
+      itemId,
+      uuid,
+      auth,
+      url,
+      localPath
     ),
 });
 

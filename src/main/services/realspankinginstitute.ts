@@ -37,9 +37,6 @@ export default {
     auth: Auth,
     itemAbstract: ItemAbstract
   ): Promise<ItemContent> => {
-    return {
-      videos: null,
-      photos: null,
-    };
+    return [];
   },
 };

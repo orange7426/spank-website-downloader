@@ -13,7 +13,7 @@ export const crawler = new Crawler({
 
 const TIMEOUT = 10000;
 
-export const download = (
+export const download = async (
   url: string,
   // eslint-disable-next-line @typescript-eslint/ban-types
   options: Object,
@@ -27,6 +27,9 @@ export const download = (
     basename = overrideFileName + path.extname(basename);
   }
   const pathWithFileName = path.join(basePath, basename);
+  if (!fs.existsSync(basePath)) {
+    fs.promises.mkdir(basePath, { recursive: true });
+  }
   const file = fs.createWriteStream(pathWithFileName);
 
   return new Promise<void>((resolve, reject) => {
