@@ -4,7 +4,7 @@ import { store } from 'renderer/store';
 import {
   pullServiceFolder,
   update as updateDatabaseCache,
-  updateItemStatus,
+  patchItem,
 } from 'renderer/store/database';
 import _partition from 'lodash/partition';
 import { toaster } from 'renderer/services/toaster';
@@ -115,10 +115,10 @@ const downloadItemImpl = async (
     const { libraryLocation } = store.getState().preferences;
 
     await store.dispatch(
-      updateItemStatus({
+      patchItem({
         serviceId,
         itemId: itemAbstract.id,
-        newStatus: 'analyzing',
+        patch: { status: 'analyzing' },
       })
     );
 
@@ -130,12 +130,20 @@ const downloadItemImpl = async (
     );
 
     await store.dispatch(
-      updateItemStatus({
+      patchItem({
         serviceId,
         itemId: itemAbstract.id,
-        newStatus: 'downloading',
+        patch: {
+          status: 'downloading',
+          progress: {
+            total: itemContent.length,
+            completed: 0,
+          },
+        },
       })
     );
+
+    let completed = 0;
 
     await Bluebird.map(
       itemContent,
@@ -149,6 +157,19 @@ const downloadItemImpl = async (
           auth,
           media.url,
           media.destination
+        );
+        completed += 1;
+        await store.dispatch(
+          patchItem({
+            serviceId,
+            itemId: itemAbstract.id,
+            patch: {
+              progress: {
+                total: itemContent.length,
+                completed,
+              },
+            },
+          })
         );
       },
       {
@@ -165,10 +186,10 @@ const downloadItemImpl = async (
     );
 
     await store.dispatch(
-      updateItemStatus({
+      patchItem({
         serviceId,
         itemId: itemAbstract.id,
-        newStatus: 'downloaded',
+        patch: { status: 'downloaded', progress: null },
       })
     );
   } catch (e) {
@@ -180,10 +201,10 @@ const downloadItemImpl = async (
       });
     }
     await store.dispatch(
-      updateItemStatus({
+      patchItem({
         serviceId,
         itemId: itemAbstract.id,
-        newStatus: 'failed',
+        patch: { status: 'failed' },
       })
     );
   }
@@ -195,10 +216,10 @@ export const downloadItem = async (
   itemAbstract: ItemAbstract
 ) => {
   await store.dispatch(
-    updateItemStatus({
+    patchItem({
       serviceId,
       itemId: itemAbstract.id,
-      newStatus: 'downloadpending',
+      patch: { status: 'downloadpending' },
     })
   );
   await queue.add(() => downloadItemImpl(serviceId, auth, itemAbstract));

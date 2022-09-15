@@ -6,11 +6,16 @@ import {
   Tag,
   Intent,
   Spinner,
+  SpinnerSize,
 } from '@blueprintjs/core';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
 import { downloadItem } from 'renderer/services/crawlerManager';
-import { openItemFolder, pullServiceFolder } from 'renderer/store/database';
+import {
+  DatabaseCacheItem,
+  openItemFolder,
+  pullServiceFolder,
+} from 'renderer/store/database';
 
 const loadingStatus = ['downloadpending', 'analyzing', 'downloading'];
 
@@ -26,11 +31,7 @@ const getHumanReadableStatus = (status: string | null): string => {
 };
 
 const ItemView = (props: {
-  item: {
-    itemAbstract: ItemAbstract;
-    localThumbnail: string | null;
-    status: string | null;
-  };
+  item: DatabaseCacheItem;
   serviceId: string;
   auth: Auth;
 }) => {
@@ -83,20 +84,32 @@ const ItemView = (props: {
         <div>
           <ButtonGroup>
             <Button
-              loading
-              small
-              disabled
-              intent={
-                item.status !== 'downloadpending' ? Intent.PRIMARY : Intent.NONE
+              text={
+                getHumanReadableStatus(item.status) +
+                (item.progress && item.progress.total > 0
+                  ? ` (${item.progress.completed} / ${item.progress.total})`
+                  : '')
               }
-            />
-            <Button
-              text={getHumanReadableStatus(item.status)}
               intent={
                 item.status !== 'downloadpending' ? Intent.PRIMARY : Intent.NONE
               }
               small
               disabled
+              icon={
+                <Spinner
+                  intent={
+                    item.status !== 'downloadpending'
+                      ? Intent.PRIMARY
+                      : Intent.NONE
+                  }
+                  size={SpinnerSize.SMALL}
+                  value={
+                    item.progress && item.progress.total > 0
+                      ? item.progress.completed / item.progress.total
+                      : undefined
+                  }
+                />
+              }
             />
             <Button text="Open" icon="share" small onClick={openFolder} />
           </ButtonGroup>

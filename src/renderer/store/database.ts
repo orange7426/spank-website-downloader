@@ -3,8 +3,15 @@ import type { AppDispatch, RootState } from '.';
 
 // Render side database cache
 
+export type DatabaseCacheItem = DatabaseServiceItem & {
+  progress?: {
+    completed: number;
+    total: number;
+  } | null;
+};
+
 export interface ServiceState {
-  items: Array<DatabaseServiceItem>;
+  items: Array<DatabaseCacheItem>;
 }
 
 export interface DatabaseState {
@@ -32,27 +39,30 @@ export const databaseSlice = createSlice({
         ...serviceState,
       };
     },
-    updateItemStatus: (
+    patchItem: (
       state,
       action: PayloadAction<{
         serviceId: string;
         itemId: string;
-        newStatus: string | null;
+        patch: Partial<DatabaseCacheItem>;
       }>
     ) => {
-      const { serviceId, itemId, newStatus } = action.payload;
+      const { serviceId, itemId, patch } = action.payload;
       const { items } = state.services[serviceId];
       if (items == null) return;
       const index = items.findIndex(
         (item) => item?.itemAbstract?.id === itemId
       );
       if (index < 0) return;
-      state.services[serviceId].items[index].status = newStatus;
+      state.services[serviceId].items[index] = {
+        ...state.services[serviceId].items[index],
+        ...patch,
+      };
     },
   },
 });
 
-export const { update, updateItemStatus } = databaseSlice.actions;
+export const { update, patchItem } = databaseSlice.actions;
 
 export default databaseSlice.reducer;
 
