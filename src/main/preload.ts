@@ -51,6 +51,7 @@ contextBridge.exposeInMainWorld('crawler', {
       auth,
       itemAbstract
     ),
+  openWebpage: (url: string) => ipcRenderer.invoke('crawler-open-webpage', url),
 });
 
 contextBridge.exposeInMainWorld('database', {

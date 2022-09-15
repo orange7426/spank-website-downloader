@@ -7,11 +7,15 @@ import {
 } from '@blueprintjs/core';
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import LibraryTable from 'renderer/components/LibraryTable';
+import LibraryTable from 'renderer/pages/library/LibraryTable';
 import { useServiceAccountMapping } from 'renderer/hooks/useServiceAccountMapping';
 import { pullIncrementalUpdates } from 'renderer/services/crawlerManager';
 
 const ServiceHeader = ({ service }: { service: Service }) => {
+  const openWebsite = () => {
+    window.crawler.openWebpage(service.website);
+  };
+
   return (
     <div
       style={{
@@ -21,7 +25,12 @@ const ServiceHeader = ({ service }: { service: Service }) => {
         flex: 1,
       }}
     >
-      <h1>{service.name}</h1>
+      <div>
+        <h1 style={{ marginTop: 0, marginBottom: 8 }}>{service.name}</h1>
+        <ButtonGroup>
+          <Button text="Open Website" icon="share" onClick={openWebsite} />
+        </ButtonGroup>
+      </div>
       {service.logo == null ? null : (
         <img style={{ maxHeight: 60 }} src={service.logo} alt="logo" />
       )}
@@ -67,6 +76,7 @@ const LibraryService = () => {
   return (
     <div>
       <ServiceHeader service={service} />
+      <Divider />
       <LibraryTable service={service} auth={account} />
     </div>
   );

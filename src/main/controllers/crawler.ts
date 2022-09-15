@@ -1,4 +1,4 @@
-import { ipcMain } from 'electron';
+import { ipcMain, shell } from 'electron';
 import _pick from 'lodash/pick';
 import _mapValues from 'lodash/mapValues';
 import services from '../services';
@@ -53,5 +53,12 @@ ipcMain.handle(
       throw new Error('Service not found');
     }
     return service.pullItemContent(crawler, auth, itemAbstract);
+  }
+);
+
+ipcMain.handle(
+  'crawler-open-webpage',
+  async (_event, url: string): Promise<void> => {
+    shell.openExternal(url);
   }
 );

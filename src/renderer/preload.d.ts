@@ -54,6 +54,7 @@ declare global {
         auth: Auth,
         itemAbstract: ItemAbstract
       ) => Promise<ItemContent>;
+      openWebpage: (url: string) => Promise<void>;
     };
     preferences: {
       selectLibraryLocation: () => Promise<string>;
