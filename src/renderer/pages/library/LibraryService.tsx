@@ -48,8 +48,6 @@ const LibraryService = () => {
     [services, serviceId]
   );
 
-  const [isPulling, setIsPulling] = React.useState(false);
-
   if (service == null) {
     return <Spinner />;
   }
@@ -66,29 +64,9 @@ const LibraryService = () => {
   //  TODO: Auto retry on multiple accounts
   const account = service.accounts[0];
 
-  const pull = async () => {
-    setIsPulling(true);
-    await pullIncrementalUpdates(service.id, account);
-    setIsPulling(false);
-  };
-
   return (
     <div>
       <ServiceHeader service={service} />
-      <div>
-        <ButtonGroup>
-          <Button icon="cloud-download" loading={isPulling} onClick={pull}>
-            Pull Incremental Updates
-          </Button>
-          <Button icon="database" intent="warning" disabled>
-            Rebuild Database
-          </Button>
-          <Divider />
-          <Button icon="double-chevron-down" disabled>
-            Enqueue All Unscheduled Items
-          </Button>
-        </ButtonGroup>
-      </div>
       <LibraryTable service={service} auth={account} />
     </div>
   );

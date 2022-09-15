@@ -7,10 +7,15 @@ import {
   Intent,
   Spinner,
   SpinnerSize,
+  Divider,
 } from '@blueprintjs/core';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
-import { downloadItem } from 'renderer/services/crawlerManager';
+import {
+  downloadItem,
+  pullIncrementalUpdates,
+} from 'renderer/services/crawlerManager';
+import { toaster } from 'renderer/services/toaster';
 import {
   DatabaseCacheItem,
   openItemFolder,
@@ -167,13 +172,74 @@ export default ({ service, auth }: { service: Service; auth: Auth }) => {
     pullFromDisk();
   }, [dispatch, pullFromDisk, service.id]);
 
+  const [isPulling, setIsPulling] = React.useState(false);
+  const pull = async () => {
+    setIsPulling(true);
+    await pullIncrementalUpdates(service.id, auth);
+    setIsPulling(false);
+  };
+
   const databaseServiceItems = useAppSelector(
     (state) => state.database.services[service.id]?.items ?? []
   );
 
+  const enqueueAllUnscheduledItems = useCallback(async () => {
+    const unscheduled = databaseServiceItems.filter(
+      (item) => item.status == null
+    );
+    if (unscheduled.length === 0) {
+      toaster.show({
+        message: `No unscheduled items. Items has already been enqueued or try to pull updates from server.`,
+        icon: 'warning-sign',
+        intent: Intent.WARNING,
+      });
+      return;
+    }
+    toaster.show({
+      message: `Enqueued ${unscheduled.length} items. Start downloading...`,
+      icon: 'bring-data',
+    });
+    await Promise.all(
+      unscheduled.map(async (item) => {
+        await downloadItem(service.id, auth, item.itemAbstract);
+      })
+    );
+    toaster.show({
+      message: `${unscheduled.length} items downloaded.`,
+      icon: 'tick',
+      intent: Intent.SUCCESS,
+    });
+  }, [auth, databaseServiceItems, service.id]);
+
   return (
     <div>
-      {isLoading && <Spinner />}
+      <div>
+        <ButtonGroup>
+          <Button icon="refresh" loading={isLoading} onClick={pullFromDisk}>
+            Refresh
+          </Button>
+          <Divider />
+          <Button
+            icon="cloud-download"
+            loading={isPulling}
+            onClick={pull}
+            disabled={isLoading}
+          >
+            Pull Incremental Updates
+          </Button>
+          {/* <Button icon="database" intent="warning" disabled>
+            Rebuild Database
+          </Button> */}
+          <Divider />
+          <Button
+            icon="double-chevron-down"
+            disabled={isLoading}
+            onClick={enqueueAllUnscheduledItems}
+          >
+            Enqueue All Unscheduled Items
+          </Button>
+        </ButtonGroup>
+      </div>
       {databaseServiceItems.map((item) => (
         <ItemView
           key={item.itemAbstract.id}
