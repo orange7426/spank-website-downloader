@@ -15,7 +15,13 @@ export default function Menu() {
         />
       </Navbar.Group>
       <Navbar.Group align={Alignment.RIGHT}>
-        <LinkButton to="preferences" className="bp4-minimal" icon="cog" />
+        {/* <TaskQueue /> */}
+        <LinkButton
+          to="preferences"
+          className="bp4-minimal"
+          icon="cog"
+          text="Preferences"
+        />
       </Navbar.Group>
     </Navbar>
   );
