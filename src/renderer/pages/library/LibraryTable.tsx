@@ -8,8 +8,9 @@ import {
   Spinner,
   SpinnerSize,
   Divider,
+  InputGroup,
 } from '@blueprintjs/core';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
 import {
   downloadItem,
@@ -21,6 +22,7 @@ import {
   openItemFolder,
   pullServiceFolder,
 } from 'renderer/store/database';
+import Fuse from 'fuse.js';
 
 const loadingStatus = ['downloadpending', 'analyzing', 'downloading'];
 
@@ -211,9 +213,25 @@ export default ({ service, auth }: { service: Service; auth: Auth }) => {
     });
   }, [auth, databaseServiceItems, service.id]);
 
+  const fuse = useMemo(() => {
+    return new Fuse(databaseServiceItems, {
+      keys: [
+        'itemAbstract.id',
+        'itemAbstract.date',
+        'itemAbstract.title',
+        'itemAbstract.descrption',
+      ],
+    });
+  }, [databaseServiceItems]);
+
+  const [pattern, setPattern] = React.useState('');
+  const searchResult = useMemo(() => {
+    return fuse.search(pattern);
+  }, [fuse, pattern]);
+
   return (
     <div>
-      <div>
+      <div style={{ marginBottom: 4 }}>
         <ButtonGroup>
           <Button icon="refresh" loading={isLoading} onClick={pullFromDisk}>
             Refresh
@@ -240,14 +258,40 @@ export default ({ service, auth }: { service: Service; auth: Auth }) => {
           </Button>
         </ButtonGroup>
       </div>
-      {databaseServiceItems.map((item) => (
-        <ItemView
-          key={item.itemAbstract.id}
-          item={item}
-          serviceId={service.id}
-          auth={auth}
+      <div>
+        <InputGroup
+          placeholder="Search..."
+          type="text"
+          leftIcon="search"
+          value={pattern}
+          onChange={(event) => setPattern(event.target.value)}
+          rightElement={
+            <Button
+              icon="cross"
+              disabled={pattern === ''}
+              minimal
+              onClick={() => setPattern('')}
+            />
+          }
         />
-      ))}
+      </div>
+      {searchResult.length > 0
+        ? searchResult.map(({ item }) => (
+            <ItemView
+              key={item.itemAbstract.id}
+              item={item}
+              serviceId={service.id}
+              auth={auth}
+            />
+          ))
+        : databaseServiceItems.map((item) => (
+            <ItemView
+              key={item.itemAbstract.id}
+              item={item}
+              serviceId={service.id}
+              auth={auth}
+            />
+          ))}
     </div>
   );
 };
