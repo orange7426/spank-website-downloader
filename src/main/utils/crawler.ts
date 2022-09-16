@@ -1,5 +1,6 @@
 import Crawler from 'crawler';
 import http from 'http';
+import https from 'https';
 import path from 'path';
 import fs from 'fs';
 
@@ -22,6 +23,8 @@ export const download = async (
 ) => {
   const start = process.hrtime();
 
+  const proto = !url.charAt(4).localeCompare('s') ? https : http;
+
   let basename = path.basename(url);
   if (overrideFileName) {
     basename = overrideFileName + path.extname(basename);
@@ -33,7 +36,7 @@ export const download = async (
   const file = fs.createWriteStream(pathWithFileName);
 
   return new Promise<void>((resolve, reject) => {
-    const req = http.get(url, options).on('response', (res) => {
+    const req = proto.get(url, options).on('response', (res) => {
       const len = parseInt(res.headers['content-length'] ?? '0', 10);
       let downloaded = 0;
       let percent = '0';

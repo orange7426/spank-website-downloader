@@ -78,6 +78,10 @@ export const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
     if (newItems.length === 0 || nextPage == null) break;
   }
 
+  // NOTE: Technically, the pulled items from service need to be deduped because
+  // pulling process can take long time. Since we are creating folder using
+  // *unique* key, OS will dedup the result for us automatically.
+
   toaster.show({
     message: `Found ${pendingItemAbstracts.length} new items. Start persisting.`,
     icon: 'floppy-disk',
