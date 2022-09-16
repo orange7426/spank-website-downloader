@@ -12,7 +12,7 @@ export default {
   website: 'https://www.realspankingsinstitute.com/',
   logo: 'http://www.realspankingsnetwork.com/images/logo_rsi.jpg',
   verifyAccount: async (crawler: Crawler, auth: Auth): Promise<boolean> =>
-    request(crawler, BASE, auth, (res) => res?.statusCode === 200),
+    request(crawler, BASE, auth, (res) => res?.statusCode === 200, false),
   pullList: async (
     crawler: Crawler,
     auth: Auth,
