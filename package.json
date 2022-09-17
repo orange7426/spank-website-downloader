@@ -194,7 +194,7 @@
   "build": {
     "productName": "SWorD",
     "appId": "org.orange.sword",
-    "asar": true,
+    "asar": false,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
       "dist",
