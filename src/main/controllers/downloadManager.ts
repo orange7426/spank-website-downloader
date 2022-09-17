@@ -3,6 +3,7 @@
 
 import { ipcMain } from 'electron';
 import BetterQueue from 'better-queue';
+import MemoryStore from 'better-queue-memory';
 import path from 'path';
 import { download } from '../utils/crawler';
 
@@ -43,6 +44,7 @@ const queue = new BetterQueue(
   {
     id: 'uuid',
     concurrent: 3,
+    store: new MemoryStore(),
   }
 );
 

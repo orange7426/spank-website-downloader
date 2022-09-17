@@ -231,34 +231,36 @@ export default ({ service, auth }: { service: Service; auth: Auth }) => {
 
   return (
     <div>
-      <div style={{ marginBottom: 4 }}>
+      <div
+        style={{
+          marginBottom: 4,
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
         <ButtonGroup>
           <Button icon="refresh" loading={isLoading} onClick={pullFromDisk}>
             Refresh
           </Button>
-          <Divider />
           <Button
             icon="cloud-download"
             loading={isPulling}
             onClick={pull}
             disabled={isLoading}
           >
-            Pull Incremental Updates
+            Pull Updates
           </Button>
           {/* <Button icon="database" intent="warning" disabled>
             Rebuild Database
           </Button> */}
-          <Divider />
           <Button
             icon="double-chevron-down"
             disabled={isLoading}
             onClick={enqueueAllUnscheduledItems}
           >
-            Enqueue All Unscheduled Items
+            Download All
           </Button>
         </ButtonGroup>
-      </div>
-      <div>
         <InputGroup
           placeholder="Search..."
           type="text"

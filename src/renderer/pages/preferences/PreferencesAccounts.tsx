@@ -94,6 +94,7 @@ function AddAccountDialog(props: React.ComponentProps<typeof MultistepDialog>) {
       icon="plus"
       title="Add New Account"
       finalButtonProps={{ disabled: verified !== true, onClick: submit }}
+      style={{ minWidth: 0 }}
     >
       <DialogStep
         id="account"

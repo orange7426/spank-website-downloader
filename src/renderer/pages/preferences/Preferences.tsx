@@ -9,15 +9,31 @@ const Preferences = () => {
       style={{
         flexDirection: 'row',
         display: 'flex',
+        flex: 1,
+        overflow: 'hidden',
       }}
     >
-      <div>
+      <div
+        className="bp4-dark"
+        style={{
+          alignSelf: 'stretch',
+          flexDirection: 'row',
+          display: 'flex',
+        }}
+      >
         <Menu>
           <LinkMenuItem to="general" text="General" />
           <LinkMenuItem to="accounts" text="Accounts" />
         </Menu>
       </div>
-      <div>
+      <div
+        style={{
+          alignSelf: 'stretch',
+          flex: 1,
+          padding: 8,
+          overflowY: 'scroll',
+        }}
+      >
         <Outlet />
       </div>
     </div>
