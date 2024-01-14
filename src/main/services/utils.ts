@@ -8,7 +8,7 @@ import { app } from 'electron';
 import Cheerio from 'cheerio';
 import moment from 'moment';
 
-const CACHE_PATH = path.join(app.getAppPath(), 'cache');
+const CACHE_PATH = app ? path.join(app.getAppPath(), 'cache') : undefined;
 
 console.log(`Cache Path: ${CACHE_PATH}`);
 
@@ -16,6 +16,7 @@ const hash = (original: string): string =>
   crypto.createHash('md5').update(original).digest('hex');
 
 const readCache = async (key: string): Promise<string | null> => {
+  if (CACHE_PATH == null) return null;
   const cachePath = path.join(CACHE_PATH, key);
   if (!fs.existsSync(cachePath)) {
     return null;
@@ -33,6 +34,7 @@ const writeCache = async (
   key: string,
   data: string | Buffer
 ): Promise<void> => {
+  if (CACHE_PATH == null) return;
   const cachePath = path.join(CACHE_PATH, key);
   if (!fs.existsSync(CACHE_PATH)) {
     await fs.promises.mkdir(CACHE_PATH, { recursive: true });
@@ -71,7 +73,6 @@ export async function request<T>(
       uri,
       auth,
       retries: 0,
-      rejectUnauthorized: false,
       callback: (err, res, done) => {
         if (err || res.statusCode !== 200) {
           reject(err);
