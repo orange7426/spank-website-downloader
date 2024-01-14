@@ -9,6 +9,7 @@ import {
   SpinnerSize,
   Divider,
   InputGroup,
+  Icon,
 } from '@blueprintjs/core';
 import React, { useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from 'renderer/hooks/store';
@@ -181,6 +182,10 @@ export default ({ service, auth }: { service: Service; auth: Auth }) => {
     setIsPulling(false);
   };
 
+  const databaseService = useAppSelector(
+    (state) => state.database.services[service.id]
+  );
+
   const databaseServiceItems = useAppSelector(
     (state) => state.database.services[service.id]?.items ?? []
   );
@@ -243,13 +248,31 @@ export default ({ service, auth }: { service: Service; auth: Auth }) => {
             Refresh
           </Button>
           <Button
-            icon="cloud-download"
-            loading={isPulling}
+            icon={
+              databaseService?.progress || isPulling ? (
+                <Spinner
+                  size={SpinnerSize.SMALL}
+                  value={
+                    databaseService?.progress &&
+                    databaseService.progress.total > 0
+                      ? databaseService.progress.completed /
+                        databaseService.progress.total
+                      : undefined
+                  }
+                />
+              ) : (
+                <Icon icon="cloud-download" />
+              )
+            }
             onClick={pull}
-            disabled={isLoading}
-          >
-            Pull Updates
-          </Button>
+            disabled={isLoading || isPulling}
+            text={
+              // eslint-disable-next-line no-nested-ternary
+              databaseService?.progress && databaseService.progress.total > 0
+                ? ` Pulling (${databaseService.progress.completed} / ${databaseService.progress.total})`
+                : 'Pull Updates'
+            }
+          />
           {/* <Button icon="database" intent="warning" disabled>
             Rebuild Database
           </Button> */}

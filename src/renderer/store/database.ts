@@ -12,6 +12,10 @@ export type DatabaseCacheItem = DatabaseServiceItem & {
 
 export interface ServiceState {
   items: Array<DatabaseCacheItem>;
+  progress?: {
+    completed: number;
+    total: number;
+  } | null;
 }
 
 export interface DatabaseState {

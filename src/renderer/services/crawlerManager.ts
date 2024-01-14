@@ -5,6 +5,7 @@ import {
   pullServiceFolder,
   update as updateDatabaseCache,
   patchItem,
+  update,
 } from 'renderer/store/database';
 import _partition from 'lodash/partition';
 import { toaster } from 'renderer/services/toaster';
@@ -75,6 +76,18 @@ export const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
       })
     );
 
+    await store.dispatch(
+      update({
+        serviceId,
+        serviceState: {
+          progress: {
+            total: pendingItemAbstracts.length,
+            completed: 0,
+          },
+        },
+      })
+    );
+
     if (newItems.length === 0 || nextPage == null) break;
   }
 
@@ -88,6 +101,7 @@ export const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
   });
 
   const { libraryLocation } = store.getState().preferences;
+  let completed = 0;
   await Bluebird.map(
     pendingItemAbstracts,
     async (itemAbstract) => {
@@ -97,11 +111,32 @@ export const pullIncrementalUpdates = async (serviceId: string, auth: Auth) => {
         auth,
         itemAbstract
       );
+      completed += 1;
+      await store.dispatch(
+        update({
+          serviceId,
+          serviceState: {
+            progress: {
+              total: pendingItemAbstracts.length,
+              completed,
+            },
+          },
+        })
+      );
     },
     { concurrency: 1 }
   );
 
   await store.dispatch(pullServiceFolder(serviceId));
+
+  await store.dispatch(
+    update({
+      serviceId,
+      serviceState: {
+        progress: null,
+      },
+    })
+  );
 
   toaster.show({
     message: `Pulling succeed.`,

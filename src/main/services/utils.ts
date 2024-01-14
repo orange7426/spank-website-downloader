@@ -71,6 +71,7 @@ export async function request<T>(
       uri,
       auth,
       retries: 0,
+      rejectUnauthorized: false,
       callback: (err, res, done) => {
         if (err || res.statusCode !== 200) {
           reject(err);
